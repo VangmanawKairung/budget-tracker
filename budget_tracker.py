@@ -20,6 +20,7 @@ FG_COLOR = "#faf9f6"  # Foreground (text) color
 CSV_FILE = "transactions.csv"
 CATEGORIES = "categories.json"
 
+
 class App:
     def __init__(self, root):
         self.root = root
@@ -29,7 +30,7 @@ class App:
         x = (screen_width // 2) - (APP_WIDTH // 2)
         y = (screen_height // 2) - (APP_HEIGHT // 2)
         self.root.geometry(f"{APP_WIDTH}x{APP_HEIGHT}+{x}+{y}")
-        
+
         # Variables
         self.date_var = StringVar(value=datetime.now().strftime("%d-%m-%Y"))
         self.transaction_type_var = StringVar(value="income")
@@ -37,12 +38,34 @@ class App:
         self.desc_var = StringVar()
         self.amount_var = StringVar()
         self.balance_var = StringVar(value="0.00")
-    
+        self.selectd_page = StringVar(value="Home")
+
+        self.create_main_frame()
+
     def create_main_frame(self):
         # Navigation Frame
-        nav_frame = Frame(self.root, bg=BG_COLOR)
+        nav_frame = Frame(self.root, bg=BG_COLOR, width=70, height=APP_HEIGHT)
+        nav_frame.pack(side="left", fill="y")
 
-        
+    def show_frame(self, frame_class):
+        pass
+
+
+class Home:
+    pass
+
+
+class Transactions:
+    pass
+
+
+class Report:
+    pass
+
+
+class Setting:
+    pass
+
 
 if __name__ == "__main__":
     root = Tk()
