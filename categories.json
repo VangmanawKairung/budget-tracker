@@ -1,0 +1,13 @@
+{
+  "income": [
+    { "th": "เงินเดือน", "en": "Salary" },
+    { "th": "โบนัส", "en": "Bonus" },
+    { "th": "อื่นๆ", "en": "Other" }
+  ],
+  "expense": [
+    { "th": "อาหาร", "en": "Food" },
+    { "th": "การเดินทาง", "en": "Transport" },
+    { "th": "บันเทิง", "en": "Entertainment" },
+    { "th": "อื่นๆ", "en": "Other" }
+  ]
+}
