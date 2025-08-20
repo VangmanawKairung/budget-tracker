@@ -13,6 +13,8 @@ import csv, os, json
 APP_TITLE = "Budget Tracker"
 APP_WIDTH = 1000
 APP_HEIGHT = 800
+DISPLAY_PANEL_WIDTH = APP_WIDTH * 0.7
+CONTROL_PANEL_WIDTH = APP_WIDTH - DISPLAY_PANEL_WIDTH
 BG_COLOR = "#212121"  # Background color
 FG_COLOR = "#faf9f6"  # Foreground (text) color
 
@@ -21,7 +23,7 @@ CSV_FILE = "transactions.csv"
 CATEGORIES = "categories.json"
 
 
-class App:
+class BudgetTracker:
     def __init__(self, root):
         self.root = root
         self.root.title(APP_TITLE)
@@ -38,36 +40,23 @@ class App:
         self.desc_var = StringVar()
         self.amount_var = StringVar()
         self.balance_var = StringVar(value="0.00")
-        self.selectd_page = StringVar(value="Home")
 
-        self.create_main_frame()
+        self.create_widget()
 
-    def create_main_frame(self):
-        # Navigation Frame
-        nav_frame = Frame(self.root, bg=BG_COLOR, width=70, height=APP_HEIGHT)
-        nav_frame.pack(side="left", fill="y")
+    def create_widget(self):
+        # กำหนด weight ให้ root เพื่อให้แต่ละคอลัมน์ขยายตามขนาดหน้าต่าง
+        self.root.grid_rowconfigure(0, weight=1)
+        self.root.grid_columnconfigure(0, weight=7)  # display_panel (70%)
+        self.root.grid_columnconfigure(1, weight=3)  # control_panel (30%)
 
-    def show_frame(self, frame_class):
-        pass
+        display_panel = Frame(self.root, bg="#FF0000")
+        display_panel.grid(row=0, column=0, sticky="nsew", pady=10, padx=10)
 
-
-class Home:
-    pass
-
-
-class Transactions:
-    pass
-
-
-class Report:
-    pass
-
-
-class Setting:
-    pass
+        control_panel = Frame(self.root, bg="#00FF00")
+        control_panel.grid(row=0, column=1, sticky="nsew")
 
 
 if __name__ == "__main__":
     root = Tk()
-    app = App(root)
+    app = BudgetTracker(root)
     root.mainloop()
