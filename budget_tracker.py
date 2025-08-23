@@ -14,8 +14,8 @@ APP_TITLE = "Budget Tracker"
 APP_WIDTH = 1000
 APP_HEIGHT = 800
 DISPLAY_PANEL_WIDTH = APP_WIDTH * 0.7
-INPUT_CONTROL_PANEL_WIDTH = APP_WIDTH * 0.3
-PADDING = 20
+CONTROL_PANEL_WIDTH = APP_WIDTH * 0.3
+PADDING = 10
 BG_COLOR = "#ff0000"  # Background color
 FG_COLOR = "#faf9f6"  # Foreground (text) color
 CONTROL_BG_COLOR = "#121212"  # Control panel background color
@@ -45,6 +45,13 @@ class BudgetTracker:
         self.desc_var = StringVar()
         self.amount_var = StringVar()
         self.balance_var = StringVar(value="0.00")
+        self.lang_var = StringVar(value="th")
+        
+        # Load categories from JSON file
+        self.categories = []
+        if os.path.exists(CATEGORIES):
+            with open(CATEGORIES, 'r', encoding='utf-8') as file:
+                self.categories = json.load(file)
 
         self.create_widget()
 
@@ -59,48 +66,61 @@ class BudgetTracker:
         display_panel.grid(row=0, column=0, sticky="nsew", pady=PADDING, padx=PADDING)
         display_panel.grid_propagate(False)
 
-        # Create input and control panel
-        input_control_panel = Frame(self.root, bg=CONTROL_BG_COLOR, width=INPUT_CONTROL_PANEL_WIDTH, height=APP_HEIGHT)
-        input_control_panel.grid(row=0, column=1, sticky="nsew")
-        input_control_panel.grid_propagate(False)
+        display_panel_grid_rows_weight = [1, 2, 10]
+        display_panel_grid_columns_weight = [1, 1, 1]
+        for i, w in enumerate(display_panel_grid_rows_weight):
+            display_panel.grid_rowconfigure(i, weight=w)
+        for i, w in enumerate(display_panel_grid_columns_weight):
+            display_panel.grid_columnconfigure(i, weight=w)
+            
+        Label(display_panel, text="Budget Tracker", bg="#ff0000",).grid(row=0, column=0, columnspan=2, sticky="w", padx=PADDING)
+        lang_button = Button(display_panel, text="en/th", bg="#00ff00", command=self.toggle_language)
+        lang_button.grid(row=0, column=2, sticky="e", padx=PADDING)
         
-        # Configure grid for control panel
-        for i in range(2):
-            input_control_panel.grid_rowconfigure(i, weight=1)
-        for i in range(1):
-            input_control_panel.grid_columnconfigure(i, weight=1)
+        # Create input and control panel
+        control_panel = Frame(self.root, bg=CONTROL_BG_COLOR, width=CONTROL_PANEL_WIDTH, height=APP_HEIGHT)
+        control_panel.grid(row=0, column=1, sticky="nsew")
+        control_panel.grid_propagate(False)
+        
+        # Create tabs in control panel tabs
+        control_panel_tabs = ttk.Notebook(control_panel)
+        control_panel_tabs.pack(fill="both", expand=True)
         
         # Create input panel inside input and control panel
-        input_panel = Frame(input_control_panel, bg="#00ff00")
-        input_panel.grid(row=0, column=0, padx=PADDING, pady=PADDING, sticky="ew")
-        
-        for i in range(10):
-            input_panel.grid_rowconfigure(i, weight=1)
-        for i in range(2):
-            input_panel.grid_columnconfigure(i, weight=1)
+        input_panel = Frame(control_panel_tabs, bg="#00ff00")
+        input_panel.pack(fill="both", expand=True)
+        control_panel_tabs.add(input_panel, text="Input")
             
-        # Create widgets in control panel
-        Label(input_panel, text="Budget Tracker", bg=CONTROL_BG_COLOR, fg=FG_COLOR).grid(row=0, column=0, columnspan=2, padx=PADDING)
-        Label(input_panel, text="Date:", bg=CONTROL_BG_COLOR, fg=FG_COLOR).grid(row=1, column=0, sticky="w")
-        Entry(input_panel, textvariable=self.date_var, bg=FG_COLOR, fg=CONTROL_BG_COLOR).grid(row=1, column=1, padx=(0, PADDING), pady=PADDING, sticky="ew")
-        Label(input_panel, text="Program:", bg=CONTROL_BG_COLOR, fg=FG_COLOR).grid(row=2, column=0, sticky="w")
-        Entry(input_panel, textvariable=self.transaction_type_var, bg=FG_COLOR, fg=CONTROL_BG_COLOR).grid(row=2, column=1, padx=(0, PADDING), pady=PADDING, sticky="ew")
+        # Add widgets in input panel
+        Label(input_panel, text=self.get_label("วันที่", "Date")).pack()
+        Entry(input_panel, textvariable=self.date_var).pack()
+        Label(input_panel, text="ประเภท").pack()
         
-        
-        # Crete control panel inside input panel
-        control_panel = Frame(input_control_panel, bg="#0000ff")
-        control_panel.grid(row=1, column=0, padx=PADDING, pady=PADDING)
-        
-        Label(control_panel, text="Category:", bg=CONTROL_BG_COLOR, fg=FG_COLOR).pack()
-        Label(control_panel, text="Category:", bg=CONTROL_BG_COLOR, fg=FG_COLOR).pack()
-        Label(control_panel, text="Category:", bg=CONTROL_BG_COLOR, fg=FG_COLOR).pack()
-        Label(control_panel, text="Category:", bg=CONTROL_BG_COLOR, fg=FG_COLOR).pack()
-        Entry(control_panel, textvariable=self.category_var, bg=FG_COLOR, fg=CONTROL_BG_COLOR).pack(padx=(0, PADDING), pady=PADDING, fill="x")
-        
+        # Radio button income
+        income_radio = ttk.Radiobutton(input_panel, text="รายรับ", variable=self.transaction_type_var, value="income")
+        income_radio.pack(anchor="w", padx=5, pady=2)
 
+        # Radio button expense
+        expense_radio = ttk.Radiobutton(input_panel, text="Expense", variable=self.transaction_type_var, value="expense")
+        expense_radio.pack(anchor="w", padx=5, pady=2)
         
+        Label(input_panel, text="หมวดหมู่").pack()
+        Entry(input_panel, textvariable=self.category_var).pack()  
+               
+            
+        # Create widgets in filter panel        
+        filter_panel = Frame(control_panel_tabs, bg="#ff0000")
+        filter_panel.pack(fill="both", expand=True)
+        control_panel_tabs.add(filter_panel, text="Filter") 
         
-
+    def toggle_language(self):
+        if self.lang_var.get() == "th":
+            self.lang_var.set("en")
+        else:
+            self.lang_var.set("th")
+            
+    def get_label(self, th_label, en_label):
+        return th_label if self.lang_var.get() == "th" else en_label
 
 if __name__ == "__main__":
     root = Tk()

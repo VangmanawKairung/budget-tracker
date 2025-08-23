@@ -1,13 +1,65 @@
 {
   "income": [
     { "th": "เงินเดือน", "en": "Salary" },
+    { "th": "ค่าจ้างรายวัน/รายชั่วโมง", "en": "Wages/Hourly Pay" },
+    { "th": "ค่าคอมมิชชัน", "en": "Commission" },
     { "th": "โบนัส", "en": "Bonus" },
-    { "th": "อื่นๆ", "en": "Other" }
+    { "th": "เงินรางวัล/เงินพิเศษ", "en": "Incentive/Stipend" },
+    { "th": "รายได้เสริม", "en": "Side Hustle Income" },
+    { "th": "รายได้จากการขายสินค้าออนไลน์", "en": "E-commerce Sales" },
+    { "th": "รายได้จากการให้เช่าทรัพย์สิน", "en": "Rental Income" },
+    { "th": "เงินปันผลจากหุ้น", "en": "Dividend Income" },
+    { "th": "ดอกเบี้ยจากเงินฝาก/การลงทุน", "en": "Interest Income" },
+    { "th": "กำไรจากการขายสินทรัพย์", "en": "Capital Gains" },
+    { "th": "รายได้ค่าลิขสิทธิ์", "en": "Royalty Income" },
+    { "th": "ค่าธรรมเนียมจากการเป็นที่ปรึกษา", "en": "Consulting Fees" },
+    { "th": "ค่าบริการฟรีแลนซ์", "en": "Freelance Service Fees" },
+    { "th": "รายได้จากการเป็นอินฟลูเอนเซอร์", "en": "Influencer Income" },
+    { "th": "รายได้จากการสอน/อบรม", "en": "Tutoring/Training Fees" },
+    { "th": "รายได้จากค่าเช่าอุปกรณ์", "en": "Equipment Rental Income" },
+    { "th": "เงินบำนาญ", "en": "Pension" },
+    { "th": "เงินบริจาค/ของขวัญ", "en": "Gifts/Donations" },
+    { "th": "รายได้อื่น ๆ", "en": "Miscellaneous Income" }
   ],
   "expense": [
-    { "th": "อาหาร", "en": "Food" },
-    { "th": "การเดินทาง", "en": "Transport" },
-    { "th": "บันเทิง", "en": "Entertainment" },
-    { "th": "อื่นๆ", "en": "Other" }
+    { "th": "ค่าเช่าที่พัก/ผ่อนบ้าน", "en": "Rent/Mortgage Payment" },
+    { "th": "ค่าผ่อนรถ", "en": "Car Payment" },
+    { "th": "ค่าน้ำ", "en": "Water Bill" },
+    { "th": "ค่าไฟ", "en": "Electricity Bill" },
+    { "th": "ค่าโทรศัพท์/อินเทอร์เน็ต", "en": "Phone/Internet Bill" },
+    { "th": "ค่าแก๊ส/น้ำมัน", "en": "Gas/Fuel" },
+    { "th": "ค่าเดินทางโดยสารสาธารณะ", "en": "Public Transportation Fare" },
+    { "th": "ค่าอาหาร (ซื้อของสด)", "en": "Groceries" },
+    { "th": "ค่าอาหารนอกบ้าน", "en": "Dining Out/Restaurants" },
+    { "th": "ค่าประกันสุขภาพ", "en": "Health Insurance" },
+    { "th": "ค่ารักษาพยาบาล", "en": "Medical Expenses" },
+    { "th": "ค่าประกันภัยรถยนต์", "en": "Car Insurance" },
+    { "th": "ค่าใช้จ่ายในชีวิตประจำวัน", "en": "Personal Care/Toiletries" },
+    { "th": "ค่าเสื้อผ้า", "en": "Clothing" },
+    {
+      "th": "ค่าสมาชิกรายเดือน/รายปี",
+      "en": "Subscriptions (e.g., Netflix, Spotify)"
+    },
+    { "th": "ค่าใช้จ่ายเพื่อความบันเทิง", "en": "Entertainment Expenses" },
+    { "th": "ค่าพักผ่อน/ท่องเที่ยว", "en": "Travel/Vacation Expenses" },
+    { "th": "ค่าเล่าเรียน/การศึกษา", "en": "Education/Tuition Fees" },
+    {
+      "th": "ค่าผ่อนชำระหนี้สิน (อื่น ๆ)",
+      "en": "Debt Repayment (Other Loans)"
+    },
+    { "th": "ค่าบัตรเครดิต", "en": "Credit Card Payments" },
+    { "th": "เงินออม/การลงทุน", "en": "Savings/Investments" },
+    { "th": "ค่าใช้จ่ายสำหรับสัตว์เลี้ยง", "en": "Pet Expenses" },
+    { "th": "ค่าใช้จ่ายสำหรับของใช้ในบ้าน", "en": "Household Goods" },
+    { "th": "ค่าบำรุงรักษาบ้าน", "en": "Home Maintenance" },
+    { "th": "ค่าซ่อมบำรุงรถยนต์", "en": "Car Maintenance/Repair" },
+    { "th": "ค่าภาษี", "en": "Taxes" },
+    { "th": "ค่าธรรมเนียมธนาคาร", "en": "Bank Fees" },
+    { "th": "ค่าของขวัญ/เงินทำบุญ", "en": "Gifts/Donations" },
+    {
+      "th": "ค่าใช้จ่ายสำหรับการออกกำลังกาย",
+      "en": "Fitness/Gym Membership"
+    },
+    { "th": "รายจ่ายอื่น ๆ", "en": "Miscellaneous Expenses" }
   ]
 }
