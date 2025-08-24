@@ -11,10 +11,10 @@ import csv, os, json
 
 # Constants for the application
 APP_TITLE = "Budget Tracker"
-APP_WIDTH = 1000
+APP_WIDTH = 1200
 APP_HEIGHT = 800
-DISPLAY_PANEL_WIDTH = APP_WIDTH * 0.7
-CONTROL_PANEL_WIDTH = APP_WIDTH * 0.3
+DISPLAY_PANEL_WIDTH = APP_WIDTH * 0.6
+CONTROL_PANEL_WIDTH = APP_WIDTH * 0.4
 PADDING = 10
 BG_COLOR = "#ff0000"  # Background color
 FG_COLOR = "#faf9f6"  # Foreground (text) color
@@ -48,8 +48,6 @@ class BudgetTracker:
             with open(CATEGORIES, "r", encoding="utf-8") as file:
                 self.categories = json.load(file)
 
-        print("Loaded categories:", self.categories)
-
         #################### Label variables ####################
         # Display panel labels
         self.title_label = StringVar(value=APP_TITLE)
@@ -73,8 +71,7 @@ class BudgetTracker:
 
         # Input panel labels
         self.add_transaction_label = StringVar(value="เพิ่มรายการ")
-        self.income_radio_label = StringVar(value="รายรับ")
-        self.expense_radio_label = StringVar(value="รายจ่าย")
+        self.income_expense_button_label = StringVar(value="รายรับ")
         self.category_input_option_label = StringVar(value="เลือกหมวดหมู่")
         self.note_label = StringVar(value="หมายเหตุ (ไม่จำเป็น)")
         self.save_button_label = StringVar(value="บันทึก")
@@ -153,21 +150,12 @@ class BudgetTracker:
         Label(input_panel, textvariable=self.type_label).pack()
 
         ## Add radio button income and expense to input panel
-        income_radio = ttk.Radiobutton(
+        income_expense_button = Button(
             input_panel,
-            textvariable=self.income_radio_label,
-            variable=self.transaction_type_var,
-            value="income",
+            textvariable=self.income_expense_button_label,
+            command=self.toggle_transaction_type,
         )
-        income_radio.pack(anchor="w", padx=5, pady=2)
-
-        expense_radio = ttk.Radiobutton(
-            input_panel,
-            textvariable=self.expense_radio_label,
-            variable=self.transaction_type_var,
-            value="expense",
-        )
-        expense_radio.pack(anchor="w", padx=5, pady=2)
+        income_expense_button.pack()
 
         ## Add category input to input panel
         Label(input_panel, textvariable=self.category_label).pack()
@@ -200,8 +188,11 @@ class BudgetTracker:
         self.process_edit_button_label.set(self.get_label("แก้ไข", "Edit"))
         self.process_delete_button_label.set(self.get_label("ลบ", "Delete"))
         self.add_transaction_label.set(self.get_label("เพิ่มรายการ", "Add Transaction"))
-        self.income_radio_label.set(self.get_label("รายรับ", "Income"))
-        self.expense_radio_label.set(self.get_label("รายจ่าย", "Expense"))
+        self.income_expense_button_label.set(
+            self.get_label("รายจ่าย", "expense")
+            if self.transaction_type_var.get() == "income"
+            else self.get_label("รายรับ", "income")
+        )
         self.category_input_option_label.set(
             self.get_label("เลือกหมวดหมู่", "Select Category")
         )
@@ -221,6 +212,18 @@ class BudgetTracker:
     # Helper function to get label based on language
     def get_label(self, th_label, en_label):
         return th_label if self.lang_var.get() == "th" else en_label
+
+    # Transaction type toggle function
+    def toggle_transaction_type(self):
+        if self.transaction_type_var.get() == "income":
+            self.transaction_type_var.set("expense")
+        else:
+            self.transaction_type_var.set("income")
+        self.income_expense_button_label.set(
+            self.get_label("รายจ่าย", "Expense")
+            if self.transaction_type_var.get() == "income"
+            else self.get_label("รายรับ", "Income")
+        )
 
 
 if __name__ == "__main__":
