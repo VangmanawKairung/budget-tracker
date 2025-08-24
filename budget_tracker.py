@@ -29,6 +29,7 @@ CATEGORIES = "categories.json"
 class BudgetTracker:
     def __init__(self, root):
         #################### Window set up ####################
+        # region
         self.root = root
         self.root.title(APP_TITLE)
         screen_width = self.root.winfo_screenwidth()
@@ -41,14 +42,19 @@ class BudgetTracker:
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
         self.root.grid_columnconfigure(1, weight=1)
+        # endregion
 
         #################### Load categories from JSON file ####################
+        # region
         self.categories = []
         if os.path.exists(CATEGORIES):
             with open(CATEGORIES, "r", encoding="utf-8") as file:
-                self.categories = json.load(file)
+                loaded_categories = json.load(file)
+                self.categories = loaded_categories
+        # endregion
 
         #################### Label variables ####################
+        # region
         # Display panel labels
         self.title_label = StringVar(value=APP_TITLE)
         self.total_income_label = StringVar(value="0.00")
@@ -87,17 +93,22 @@ class BudgetTracker:
         self.export_csv_button_label = StringVar(value="ส่งออก CSV")
         self.export_pdf_button_label = StringVar(value="ส่งออก PDF")
         self.delete_all_button_label = StringVar(value="ลบทั้งหมด")
+        # endregion
 
         #################### Common variables ####################
+        # region
         self.lang_var = StringVar(value="th")
         self.date_var = StringVar(value=datetime.now().strftime("%d-%m-%Y"))
         self.transaction_type_var = StringVar(value="income")
         self.category_var = StringVar()
         self.desc_var = StringVar()
         self.amount_var = StringVar()
+        # endregion
 
         #################### Execute ####################
+        # region
         self.create_widget()
+        # endregion
 
     # Create main widgets
     def create_widget(self):
@@ -149,17 +160,32 @@ class BudgetTracker:
         Entry(input_panel, textvariable=self.date_var).pack()
         Label(input_panel, textvariable=self.type_label).pack()
 
-        ## Add radio button income and expense to input panel
-        income_expense_button = Button(
+        ## Add radio buttons income and expense to input panel
+        self.income_radio = ttk.Radiobutton(
             input_panel,
-            textvariable=self.income_expense_button_label,
-            command=self.toggle_transaction_type,
+            text=self.get_label("รายรับ", "Income"),
+            variable=self.transaction_type_var,
+            value="income",
         )
-        income_expense_button.pack()
+        self.income_radio.pack()
+        self.expense_radio = ttk.Radiobutton(
+            input_panel,
+            text=self.get_label("รายจ่าย", "Expense"),
+            variable=self.transaction_type_var,
+            value="expense",
+        )
+        self.expense_radio.pack()
 
         ## Add category input to input panel
         Label(input_panel, textvariable=self.category_label).pack()
-        Entry(input_panel, textvariable=self.category_var).pack()
+        self.input_category_options = ttk.Combobox(
+            input_panel, textvariable=self.category_var
+        )
+        self.input_category_options.pack()
+        self.input_category_options.config(
+            values=self.get_category_values()
+        )  # Placeholder values
+        self.input_category_options.current()
 
         # Create widgets in filter panel
         filter_panel = Frame(control_panel_tabs, bg="#ff0000")
@@ -209,6 +235,16 @@ class BudgetTracker:
         self.export_pdf_button_label.set(self.get_label("ส่งออก PDF", "Export PDF"))
         self.delete_all_button_label.set(self.get_label("ลบทั้งหมด", "Delete All"))
 
+        # Update radiobutton texts
+        self.income_radio.config(text=self.get_label("รายรับ", "Income"))
+        self.expense_radio.config(text=self.get_label("รายจ่าย", "Expense"))
+
+        # Update category combobox values so dropdown reflects current language
+        if hasattr(self, "category_combobox"):
+            self.category_combobox.config(values=self.get_category_values())
+
+        self.input_category_options.config(values=self.get_category_values())
+
     # Helper function to get label based on language
     def get_label(self, th_label, en_label):
         return th_label if self.lang_var.get() == "th" else en_label
@@ -224,6 +260,22 @@ class BudgetTracker:
             if self.transaction_type_var.get() == "income"
             else self.get_label("รายรับ", "Income")
         )
+        self.input_category_options.config(values=self.get_category_values())
+
+    # Get category values based on selected language and transaction type
+    def get_category_values(self):
+        if self.transaction_type_var.get() == "income":
+            return [
+                cat["th"] if self.lang_var.get() == "th" else cat["en"]
+                for cat in self.categories
+                if self.transaction_type_var.get() == "income"
+            ]
+        else:
+            return [
+                cat["th"] if self.lang_var.get() == "th" else cat["en"]
+                for cat in self.categories
+                if self.transaction_type_var.get() == "expense"
+            ]
 
 
 if __name__ == "__main__":
