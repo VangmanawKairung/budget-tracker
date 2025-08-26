@@ -4,7 +4,7 @@ Author: Kairung Vangmanaw
 Date: August 2025
 """
 
-from tkinter import Tk, Frame, Label, Button, Entry, StringVar, messagebox
+from tkinter import Tk, Frame, Label, Button, Entry, StringVar, messagebox, Text
 from tkinter import ttk
 from datetime import datetime
 import csv, os, json
@@ -165,16 +165,22 @@ class BudgetTracker:
             date_input_panel,
             textvariable=self.day_var,
             values=days,
+            width=5,
+            state="readonly",
         ).grid(row=0, column=0)
         month_option = ttk.Combobox(
             date_input_panel,
             textvariable=self.month_var,
             values=months,
+            width=5,
+            state="readonly",
         ).grid(row=0, column=1)
         year_option = ttk.Combobox(
             date_input_panel,
             textvariable=self.year_var,
             values=years,
+            width=5,
+            state="readonly",
         ).grid(row=0, column=2)
 
         ## Add radio buttons income and expense to input panel
@@ -207,7 +213,52 @@ class BudgetTracker:
 
         ## Add amount input to input panel
         Label(input_panel, textvariable=self.amount_label).pack()
-        Entry(input_panel, textvariable=self.amount_var).pack()
+
+        vcmd = (self.root.register(self.validate_amount), "%P")
+
+        Entry(
+            input_panel,
+            textvariable=self.amount_var,
+            validate="key",
+            validatecommand=vcmd,
+        ).pack()
+
+        ## Add description input to input panel
+        Label(input_panel, textvariable=self.description_label).pack()
+        self.desc_var = Text(input_panel, height=5)
+        self.desc_var.pack()
+
+        ## Add note input to input panel
+        Label(input_panel, textvariable=self.note_label).pack()
+        self.note_var = Text(input_panel, height=5)
+        self.note_var.pack()
+
+        ## Add save and reset buttons to input panel
+        button_panel = Frame(input_panel, bg="#ffff00")
+        button_panel.pack(pady=PADDING)
+        button_panel.grid_rowconfigure(0, weight=1)
+        button_panel.grid_columnconfigure(0, weight=1)
+        button_panel.grid_columnconfigure(1, weight=1)
+
+        ### Save button
+        save_button = Button(
+            button_panel,
+            textvariable=self.save_button_label,
+            bg="#00ffff",
+            width=10,
+            command=self.save_transaction,
+        )
+        save_button.grid(row=0, column=0, padx=PADDING)
+
+        ### Reset button
+        reset_button = Button(
+            button_panel,
+            textvariable=self.reset_button_label,
+            bg="#00ffff",
+            width=10,
+            command=self.reset_fields,
+        )
+        reset_button.grid(row=0, column=1, padx=PADDING)
 
         # Create widgets in filter panel
         filter_panel = Frame(control_panel_tabs, bg="#ff0000")
@@ -288,6 +339,20 @@ class BudgetTracker:
         )
 
         print(self.date_var.get())
+
+    # Amount validation
+    def validate_amount(self, amount):
+        if amount == "":
+            return True
+        return amount.isdigit()
+
+    # Save transaction
+    def save_transaction(self):
+        pass
+
+    # Reset input fields
+    def reset_fields(self):
+        pass
 
 
 if __name__ == "__main__":
