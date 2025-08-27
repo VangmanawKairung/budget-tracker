@@ -102,12 +102,19 @@ class BudgetTracker:
         #################### Execute ####################
         self.create_widget()
 
+    #################### Create widgets ####################
     # Create main widgets
     def create_widget(self):
-        #################### Create display panel ####################
-        # Initialize display panel
+        # Create display panel
+        self.create_display_panel_widgets(self.root)
+
+        # Create control panel
+        self.create_control_panel_widgets(self.root)
+
+    # Create display panel widgets
+    def create_display_panel_widgets(self, parent):
         display_panel = Frame(
-            self.root, bg=DISPLAY_BG_COLOR, width=DISPLAY_PANEL_WIDTH, height=APP_HEIGHT
+            parent, bg=DISPLAY_BG_COLOR, width=DISPLAY_PANEL_WIDTH, height=APP_HEIGHT
         )
         display_panel.grid(row=0, column=0, sticky="nsew", pady=PADDING, padx=PADDING)
         display_panel.grid_propagate(False)
@@ -120,20 +127,40 @@ class BudgetTracker:
         for i, w in enumerate(display_panel_grid_columns_weight):
             display_panel.grid_columnconfigure(i, weight=w)
 
-        # Add title and language toggle button
+        self.create_title_lang_panel(display_panel)
+        self.create_summary_panel(display_panel)
+        self.create_transaction_list_panel(display_panel)
+
+    ## Create title and language toggle button panel
+    def create_title_lang_panel(self, parent):
         Label(
-            display_panel,
+            parent,
             textvariable=self.title_label,
             bg="#ff0000",
         ).grid(row=0, column=0, columnspan=2, sticky="w", padx=PADDING)
         lang_button = Button(
-            display_panel, text="EN | TH", bg="#00ff00", command=self.toggle_language
+            parent, text="EN | TH", bg="#00ff00", command=self.toggle_language
         )
         lang_button.grid(row=0, column=2, sticky="e", padx=PADDING)
 
-        #################### Create control panel ####################
+    ## Create summary panel
+    def create_summary_panel(self, parent):
+        self.create_summary_widgets(parent)
+        self.create_summary_widgets(parent)
+        self.create_summary_widgets(parent)
+
+    ### Create summary widgets
+    def create_summary_widgets(self, parent):
+        pass
+
+    ## Create transaction list panel
+    def create_transaction_list_panel(self, parent):
+        pass
+
+    # Create control panel widgets
+    def create_control_panel_widgets(self, parent):
         control_panel = Frame(
-            self.root, bg=CONTROL_BG_COLOR, width=CONTROL_PANEL_WIDTH, height=APP_HEIGHT
+            parent, bg=CONTROL_BG_COLOR, width=CONTROL_PANEL_WIDTH, height=APP_HEIGHT
         )
         control_panel.grid(row=0, column=1, sticky="nsew")
         control_panel.grid_propagate(False)
@@ -143,95 +170,31 @@ class BudgetTracker:
         control_panel_tabs.pack(fill="both", expand=True)
 
         # Create input panel inside control panel
-        input_panel = Frame(control_panel_tabs, bg="#00ff00")
+        self.create_input_panel_widgets(control_panel_tabs)
+
+        # Create filter panel inside control panel
+        # self.create_filter_panel_widgets(control_panel_tabs)
+
+    ## Create input panel widgets
+    def create_input_panel_widgets(self, parent):
+        # Create input panel inside control panel
+        input_panel = Frame(parent, bg="#00ff00")
         input_panel.pack(fill="both", expand=True)
-        control_panel_tabs.add(input_panel, text="Input")
+        parent.add(input_panel, text="Input")
 
         # Add widgets in input panel
-        ## Add date input to input panel
-        Label(input_panel, textvariable=self.date_label).pack()
-
-        date_input_panel = Frame(input_panel, bg="#0000ff")
-        date_input_panel.pack()
-        date_input_panel.grid_rowconfigure(0, weight=1)
-        for i in range(3):
-            date_input_panel.grid_columnconfigure(i, weight=1)
-
-        days = [str(d) for d in range(1, 32)]
-        months = [str(m) for m in range(1, 13)]
-        years = [str(y) for y in range(2000, datetime.now().year + 1)]
-
-        day_option = ttk.Combobox(
-            date_input_panel,
-            textvariable=self.day_var,
-            values=days,
-            width=5,
-            state="readonly",
-        ).grid(row=0, column=0)
-        month_option = ttk.Combobox(
-            date_input_panel,
-            textvariable=self.month_var,
-            values=months,
-            width=5,
-            state="readonly",
-        ).grid(row=0, column=1)
-        year_option = ttk.Combobox(
-            date_input_panel,
-            textvariable=self.year_var,
-            values=years,
-            width=5,
-            state="readonly",
-        ).grid(row=0, column=2)
-
-        ## Add radio buttons income and expense to input panel
-        Label(input_panel, textvariable=self.type_label).pack()
-        self.income_radio = ttk.Radiobutton(
-            input_panel,
-            text=self.get_label("รายรับ", "Income"),
-            variable=self.transaction_type_var,
-            value="income",
-            command=self.get_category_values,
-        )
-        self.income_radio.pack()
-        self.expense_radio = ttk.Radiobutton(
-            input_panel,
-            text=self.get_label("รายจ่าย", "Expense"),
-            variable=self.transaction_type_var,
-            value="expense",
-            command=self.get_category_values,
-        )
-        self.expense_radio.pack()
-
-        ## Add category input to input panel
-        Label(input_panel, textvariable=self.category_label).pack()
-        self.categorie_option = ttk.Combobox(
-            input_panel, textvariable=self.category_var, state="readonly"
-        )
-        self.get_category_values()
-        self.categorie_option.current(0)
-        self.categorie_option.pack()
-
-        ## Add amount input to input panel
-        Label(input_panel, textvariable=self.amount_label).pack()
-
-        vcmd = (self.root.register(self.validate_amount), "%P")
-
-        Entry(
-            input_panel,
-            textvariable=self.amount_var,
-            validate="key",
-            validatecommand=vcmd,
-        ).pack()
-
-        ## Add description input to input panel
-        Label(input_panel, textvariable=self.description_label).pack()
-        self.desc_var = Text(input_panel, height=5)
-        self.desc_var.pack()
-
-        ## Add note input to input panel
-        Label(input_panel, textvariable=self.note_label).pack()
-        self.note_var = Text(input_panel, height=5)
-        self.note_var.pack()
+        self.create_date_input_widgets(input_panel)  # Add date input to input panel
+        self.create_income_expense_input_widgets(
+            input_panel
+        )  # Add radio buttons income and expense to input panel
+        self.create_category_input_widgets(
+            input_panel
+        )  # Add category input to input panel
+        self.create_amount_input_widgets(input_panel)  # Add amount input to input panel
+        self.create_description_input_widgets(
+            input_panel
+        )  # Add description input to input panel
+        self.create_note_input_widgets(input_panel)  # Add note input to input panel
 
         ## Add save and reset buttons to input panel
         button_panel = Frame(input_panel, bg="#ffff00")
@@ -260,10 +223,125 @@ class BudgetTracker:
         )
         reset_button.grid(row=0, column=1, padx=PADDING)
 
-        # Create widgets in filter panel
-        filter_panel = Frame(control_panel_tabs, bg="#ff0000")
+    ### Create date input widgets
+    def create_date_input_widgets(self, parent):
+        Label(parent, textvariable=self.date_label).pack()
+        date_input_panel = Frame(parent, bg="#0000ff")
+        date_input_panel.pack()
+        date_input_panel.grid_rowconfigure(0, weight=1)
+        for i in range(3):
+            date_input_panel.grid_columnconfigure(i, weight=1)
+
+        days = [str(d) for d in range(1, 32)]
+        months = [str(m) for m in range(1, 13)]
+        years = [str(y) for y in range(2000, datetime.now().year + 1)]
+
+        ttk.Combobox(
+            date_input_panel,
+            textvariable=self.day_var,
+            values=days,
+            width=5,
+            state="readonly",
+        ).grid(row=0, column=0)
+        ttk.Combobox(
+            date_input_panel,
+            textvariable=self.month_var,
+            values=months,
+            width=5,
+            state="readonly",
+        ).grid(row=0, column=1)
+        ttk.Combobox(
+            date_input_panel,
+            textvariable=self.year_var,
+            values=years,
+            width=5,
+            state="readonly",
+        ).grid(row=0, column=2)
+
+    ### Create income/expense input widgets
+    def create_income_expense_input_widgets(self, parent):
+        Label(parent, textvariable=self.type_label).pack()
+        self.income_radio = ttk.Radiobutton(
+            parent,
+            text=self.get_label("รายรับ", "Income"),
+            variable=self.transaction_type_var,
+            value="income",
+            command=self.get_category_values,
+        )
+        self.income_radio.pack()
+        self.expense_radio = ttk.Radiobutton(
+            parent,
+            text=self.get_label("รายจ่าย", "Expense"),
+            variable=self.transaction_type_var,
+            value="expense",
+            command=self.get_category_values,
+        )
+        self.expense_radio.pack()
+
+    ### Create category input widgets
+    def create_category_input_widgets(self, parent):
+        Label(parent, textvariable=self.category_label).pack()
+        self.categorie_option = ttk.Combobox(
+            parent, textvariable=self.category_var, state="readonly"
+        )
+        self.get_category_values()
+        self.categorie_option.current(0)
+        self.categorie_option.pack()
+
+    ### Create amount input widgets
+    def create_amount_input_widgets(self, parent):
+        Label(parent, textvariable=self.amount_label).pack()
+        vcmd = (self.root.register(self.validate_amount), "%P")
+        Entry(
+            parent,
+            textvariable=self.amount_var,
+            validate="key",
+            validatecommand=vcmd,
+        ).pack()
+
+    ### Create description input widgets
+    def create_description_input_widgets(self, parent):
+        Label(parent, textvariable=self.description_label).pack()
+        self.desc_var = Text(parent, height=5)
+        self.desc_var.pack()
+
+    ### Create note input widgets
+    def create_note_input_widgets(self, parent):
+        Label(parent, textvariable=self.note_label).pack()
+        self.note_var = Text(parent, height=5)
+        self.note_var.pack()
+
+    ### Create save and reset button widgets
+    def create_save_reset_button_widgets(self, parent):
+        pass
+
+    ## Create filter panel widgets
+    def create_filter_panel_widgets(self, parent):
+        filter_panel = Frame(parent, bg="#ff0000")
         filter_panel.pack(fill="both", expand=True)
-        control_panel_tabs.add(filter_panel, text="Filter")
+        parent.add(filter_panel, text="Filter")
+
+    ### Create button widgets
+    def create_button_widgets(
+        self,
+        parent,
+        text_var,
+        bg_color,
+        width,
+        command,
+        pack_or_grid="pack",
+        **options,
+    ):
+        btn = Button(
+            parent, textvariable=text_var, bg=bg_color, width=width, command=command
+        )
+
+        if pack_or_grid == "pack":
+            btn.pack(**options)
+        elif pack_or_grid == "grid":
+            btn.grid(**options)
+
+    #################### Helper functions ####################
 
     # Toggle language function
     def toggle_language(self):
