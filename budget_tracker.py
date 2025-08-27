@@ -436,7 +436,14 @@ class BudgetTracker:
 
     # Reset input fields
     def reset_fields(self):
-        pass
+        self.day_var.set(datetime.now().day)
+        self.month_var.set(datetime.now().month)
+        self.year_var.set(datetime.now().year)
+        self.transaction_type_var.set("income")
+        self.get_category_values()
+        self.amount_var.set("")
+        self.desc_var.delete("1.0", "end")
+        self.note_var.delete("1.0", "end")
 
 
 if __name__ == "__main__":
