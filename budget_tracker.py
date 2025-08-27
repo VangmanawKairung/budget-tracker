@@ -196,32 +196,9 @@ class BudgetTracker:
         )  # Add description input to input panel
         self.create_note_input_widgets(input_panel)  # Add note input to input panel
 
-        ## Add save and reset buttons to input panel
-        button_panel = Frame(input_panel, bg="#ffff00")
-        button_panel.pack(pady=PADDING)
-        button_panel.grid_rowconfigure(0, weight=1)
-        button_panel.grid_columnconfigure(0, weight=1)
-        button_panel.grid_columnconfigure(1, weight=1)
-
-        ### Save button
-        save_button = Button(
-            button_panel,
-            textvariable=self.save_button_label,
-            bg="#00ffff",
-            width=10,
-            command=self.save_transaction,
-        )
-        save_button.grid(row=0, column=0, padx=PADDING)
-
-        ### Reset button
-        reset_button = Button(
-            button_panel,
-            textvariable=self.reset_button_label,
-            bg="#00ffff",
-            width=10,
-            command=self.reset_fields,
-        )
-        reset_button.grid(row=0, column=1, padx=PADDING)
+        self.create_save_reset_button_widgets(
+            input_panel
+        )  # Add save and reset buttons to input panel
 
     ### Create date input widgets
     def create_date_input_widgets(self, parent):
@@ -313,7 +290,37 @@ class BudgetTracker:
 
     ### Create save and reset button widgets
     def create_save_reset_button_widgets(self, parent):
-        pass
+        button_panel = Frame(parent, bg="#ffff00")
+        button_panel.pack(pady=PADDING)
+        button_panel.grid_rowconfigure(0, weight=1)
+        button_panel.grid_columnconfigure(0, weight=1)
+        button_panel.grid_columnconfigure(1, weight=1)
+
+        # Save button
+        self.create_button_widgets(
+            button_panel,
+            self.save_button_label,
+            "#00ffff",
+            10,
+            self.save_transaction,
+            pack_or_grid="grid",
+            row=0,
+            column=0,
+            padx=PADDING,
+        )
+
+        # Reset button
+        self.create_button_widgets(
+            button_panel,
+            self.reset_button_label,
+            "#00ffff",
+            10,
+            self.reset_fields,
+            pack_or_grid="grid",
+            row=0,
+            column=1,
+            padx=PADDING,
+        )
 
     ## Create filter panel widgets
     def create_filter_panel_widgets(self, parent):
@@ -406,7 +413,6 @@ class BudgetTracker:
                 for category in self.categories["expense"]
             ]
         self.categorie_option.current(0)
-        print(self.categorie_option["values"])
 
     # Set the selected date in the date input fields
     def set_selected_date(self):
