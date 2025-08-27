@@ -279,12 +279,14 @@ class BudgetTracker:
     ### Create description input widgets
     def create_description_input_widgets(self, parent):
         Label(parent, textvariable=self.description_label).pack()
+        self.desc_text_widget = Text(parent, height=5)
         self.desc_var = Text(parent, height=5)
         self.desc_var.pack()
 
     ### Create note input widgets
     def create_note_input_widgets(self, parent):
         Label(parent, textvariable=self.note_label).pack()
+        self.note_text_widget = Text(parent, height=5)
         self.note_var = Text(parent, height=5)
         self.note_var.pack()
 
@@ -432,7 +434,36 @@ class BudgetTracker:
 
     # Save transaction
     def save_transaction(self):
-        pass
+        date = datetime(
+            int(self.year_var.get()), int(self.month_var.get()), int(self.day_var.get())
+        ).strftime("%d-%m-%Y")
+        transaction_type = self.transaction_type_var.get()
+        category = self.category_var.get()
+        amount = self.amount_var.get()
+        description = self.desc_text_widget.get("1.0", "end").strip()
+        description = self.desc_var.get("1.0", "end").strip()
+        note = self.note_var.get("1.0", "end").strip()
+
+        if not amount:
+            messagebox.showerror(
+                self.get_label("ข้อผิดพลาด", "Error"),
+                self.get_label("กรุณาใส่จำนวนเงิน", "Please enter an amount"),
+            )
+            return
+
+        # Save to CSV file
+        file_exists = os.path.isfile(CSV_FILE)
+        with open(CSV_FILE, mode="a", newline="", encoding="utf-8") as file:
+            writer = csv.writer(file)
+            if not file_exists:
+                writer.writerow(
+                    ["Date", "Category", "Type", "Amount", "Description", "Note"]
+                )
+            writer.writerow(
+                [date, category, transaction_type, float(amount), description, note]
+            )
+
+        self.reset_fields()
 
     # Reset input fields
     def reset_fields(self):
@@ -442,6 +473,7 @@ class BudgetTracker:
         self.transaction_type_var.set("income")
         self.get_category_values()
         self.amount_var.set("")
+        self.desc_text_widget.delete("1.0", "end")
         self.desc_var.delete("1.0", "end")
         self.note_var.delete("1.0", "end")
 
