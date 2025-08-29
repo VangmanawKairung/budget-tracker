@@ -27,6 +27,7 @@ CATEGORIES = "categories.json"
 
 
 class BudgetTracker:
+    #################### Initiation ####################
     def __init__(self, root):
         #################### Window set up ####################
         self.root = root
@@ -98,9 +99,14 @@ class BudgetTracker:
         self.category_var = StringVar()
         self.amount_var = StringVar()
         self.desc_var = StringVar()
+        self.loaded_transactions = []
 
         #################### Execute ####################
         self.create_widget()
+
+        # Load existing transactions from CSV file
+        if os.path.exists(CSV_FILE):
+            self.load_transactions()
 
     #################### Create widgets ####################
     # Create main widgets
@@ -145,13 +151,37 @@ class BudgetTracker:
 
     ## Create summary panel
     def create_summary_panel(self, parent):
-        self.create_summary_widgets(parent)
-        self.create_summary_widgets(parent)
-        self.create_summary_widgets(parent)
+
+        print(
+            self.total_income_label, self.total_expense_label, self.total_balance_label
+        )
+        self.create_summary_widgets(
+            parent,
+            "#00ffff",
+            "รายรับรวม",
+            self.total_income_label,
+            row=1,
+            column=0,
+        )
+        self.create_summary_widgets(
+            parent,
+            "#ffff00",
+            "รายจ่ายรวม",
+            self.total_expense_label,
+            row=1,
+            column=1,
+        )
+        self.create_summary_widgets(
+            parent, "#ff00ff", "คงเหลือ", self.total_balance_label, row=1, column=2
+        )
 
     ### Create summary widgets
-    def create_summary_widgets(self, parent):
-        pass
+    def create_summary_widgets(self, parent, bg, head_label, value_label, **options):
+        sub_frame = Frame(parent, bg=bg, padx=10, relief="ridge", bd=2)
+        sub_frame.grid(**options)
+
+        Label(sub_frame, text=head_label).pack()
+        Label(sub_frame, textvariable=value_label).pack()
 
     ## Create transaction list panel
     def create_transaction_list_panel(self, parent):
@@ -464,6 +494,7 @@ class BudgetTracker:
             )
 
         self.reset_fields()
+        self.load_transactions()
 
     # Reset input fields
     def reset_fields(self):
@@ -476,6 +507,38 @@ class BudgetTracker:
         self.desc_text_widget.delete("1.0", "end")
         self.desc_var.delete("1.0", "end")
         self.note_var.delete("1.0", "end")
+
+    # Load transactions from CSV file
+    def load_transactions(self):
+        with open(CSV_FILE, mode="r", newline="", encoding="utf-8") as file:
+            reader = csv.DictReader(file)
+            self.loaded_transactions = list(reader)
+        self.get_totals()
+
+    # Get total income, expense, and balance
+    def get_totals(self):
+        # Calculate total income
+        total_income = sum(
+            float(trans["Amount"])
+            for trans in self.loaded_transactions
+            if trans["Type"] == "income"
+        )
+        # Calculate total expense
+        total_expense = sum(
+            float(trans["Amount"])
+            for trans in self.loaded_transactions
+            if trans["Type"] == "expense"
+        )
+
+        # Calculate total balance
+        total_balance = total_income - total_expense
+
+        print(f"{total_income:,.2f}")
+
+        # Update variables
+        self.total_income_label.set(f"{total_income:,.2f}")
+        self.total_expense_label.set(f"{total_expense:,.2f}")
+        self.total_balance_label.set(f"{total_balance:,.2f}")
 
 
 if __name__ == "__main__":
