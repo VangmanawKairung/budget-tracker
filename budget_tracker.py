@@ -515,7 +515,6 @@ class BudgetTracker:
 
     # Get category values based on transaction type and language
     def get_category_values(self):
-        print(self.transaction_type_var.get())
         if self.transaction_type_var.get() == "income":
             self.categorie_option["values"] = [
                 category["th"] if self.lang_var.get() == "th" else category["en"]
@@ -597,8 +596,6 @@ class BudgetTracker:
 
         # Calculate total balance
         total_balance = total_income - total_expense
-
-        print(f"{total_income:,.2f}")
 
         # Update variables
         self.total_income_var.set(f"{total_income:,.2f}")
