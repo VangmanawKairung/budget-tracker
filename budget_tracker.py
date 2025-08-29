@@ -16,12 +16,20 @@ APP_HEIGHT = 800
 DISPLAY_PANEL_WIDTH = APP_WIDTH * 0.6
 CONTROL_PANEL_WIDTH = APP_WIDTH * 0.4
 PADDING = 10
-BG_COLOR = "#ff0000"  # Background color
-FG_COLOR = "#faf9f6"  # Foreground (text) color
-CONTROL_BG_COLOR = "#121212"  # Control panel background color
-DISPLAY_BG_COLOR = "#171717"  # Display panel background color
 
-# CSV file for persistent storage
+# Color
+DISPLAY_BG_COLOR = "#2b2b2b"
+CONTROL_BG_COLOR = "#0f0f0f"
+INCOME_COLOR = "#95e913"
+EXPENSE_COLOR = "#f50c20"
+BALANCE_COLOR = "#2323ff"
+TEXT_COLOR = "#f1f0ee"
+NORMAL_BTN_COLOR = "#2b2b2b"
+NORMAL_BTN_HOVER_COLOR = "#424242"
+SUBMIT_BTN_COLOR = "#0404e1"
+SUBMIT_BTN_HOVER_COLOR = "#2929ff"
+
+# File
 CSV_FILE = "transactions.csv"
 CATEGORIES = "categories.json"
 
@@ -38,7 +46,7 @@ class BudgetTracker:
         y = (screen_height // 2) - (APP_HEIGHT // 2)
         self.root.geometry(f"{APP_WIDTH}x{APP_HEIGHT}+{x}+{y}")
         self.root.resizable(False, False)
-        self.root.configure(bg=BG_COLOR)
+        self.root.configure(bg=DISPLAY_BG_COLOR)
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
         self.root.grid_columnconfigure(1, weight=1)
@@ -119,6 +127,40 @@ class BudgetTracker:
         if os.path.exists(CSV_FILE):
             self.load_transactions()
 
+        #################### Style Configuration ####################
+        style = ttk.Style()
+        style.theme_use("default")
+
+        # Normal Button
+        style.configure(
+            "Normal.TButton",
+            background=NORMAL_BTN_COLOR,
+            foreground=TEXT_COLOR,
+            borderwidth=0,
+            focusthickness=3,
+            focuscolor="none",
+        )
+        style.map(
+            "Normal.TButton",
+            background=[("active", NORMAL_BTN_HOVER_COLOR)],
+            foreground=[("disabled", TEXT_COLOR)],
+        )
+
+        # Submit Button
+        style.configure(
+            "Submit.TButton",
+            background=SUBMIT_BTN_COLOR,
+            foreground=TEXT_COLOR,
+            borderwidth=0,
+            focusthickness=3,
+            focuscolor="none",
+        )
+        style.map(
+            "Submit.TButton",
+            background=[("active", SUBMIT_BTN_HOVER_COLOR)],
+            foreground=[("disabled", TEXT_COLOR)],
+        )
+
     #################### Create widgets ####################
     # Create main widgets
     def create_widget(self):
@@ -151,12 +193,10 @@ class BudgetTracker:
     ## Create title and language toggle button panel
     def create_title_lang_panel(self, parent):
         Label(
-            parent,
-            textvariable=self.title_label,
-            bg="#ff0000",
+            parent, textvariable=self.title_label, bg=DISPLAY_BG_COLOR, fg=TEXT_COLOR
         ).grid(row=0, column=0, columnspan=2, sticky="w", padx=PADDING)
         lang_button = Button(
-            parent, text="EN | TH", bg="#00ff00", command=self.toggle_language
+            parent, text="EN | TH", bg=DISPLAY_BG_COLOR, command=self.toggle_language
         )
         lang_button.grid(row=0, column=2, sticky="e", padx=PADDING)
 
@@ -165,7 +205,7 @@ class BudgetTracker:
 
         self.create_summary_widgets(
             parent,
-            "#00ffff",
+            INCOME_COLOR,
             self.total_income_label,
             self.total_income_var,
             row=1,
@@ -173,7 +213,7 @@ class BudgetTracker:
         )
         self.create_summary_widgets(
             parent,
-            "#ffff00",
+            EXPENSE_COLOR,
             self.total_expense_label,
             self.total_expense_var,
             row=1,
@@ -181,7 +221,7 @@ class BudgetTracker:
         )
         self.create_summary_widgets(
             parent,
-            "#ff00ff",
+            BALANCE_COLOR,
             self.total_balance_label,
             self.total_balance_var,
             row=1,
@@ -190,11 +230,20 @@ class BudgetTracker:
 
     ### Create summary widgets
     def create_summary_widgets(self, parent, bg, head_label, value_label, **options):
-        sub_frame = Frame(parent, bg=bg, padx=10, relief="ridge", bd=2)
+        sub_frame = Frame(
+            parent,
+            bg=bg,
+            relief="solid",
+            highlightthickness=2,
+            highlightbackground="#990000",
+            highlightcolor="#880088",
+            padx=10,
+            bd=2,
+        )
         sub_frame.grid(**options)
 
-        Label(sub_frame, textvariable=head_label).pack()
-        Label(sub_frame, textvariable=value_label).pack()
+        Label(sub_frame, textvariable=head_label, bg=bg).pack()
+        Label(sub_frame, textvariable=value_label, bg=bg).pack()
 
     ## Create transaction list panel
     def create_transaction_list_panel(self, parent):
@@ -227,7 +276,7 @@ class BudgetTracker:
         scrollbar.pack(side="right", fill="y")
         self.transaction_table.pack(fill="both", expand=True)
 
-        # เรียกรีเฟรชตอนสร้างครั้งแรก
+        # Refresh first time
         self.refresh_transaction_table()
 
     def refresh_transaction_table(self):
@@ -267,10 +316,14 @@ class BudgetTracker:
         # Create filter panel inside control panel
         # self.create_filter_panel_widgets(self.control_panel_tabs)
 
+        # Style
+        style = ttk.Style()
+        style.configure("TNotebook", bg=CONTROL_BG_COLOR)
+
     ## Create input panel widgets
     def create_input_panel_widgets(self, parent):
         # Create input panel inside control panel
-        self.input_panel = Frame(parent, bg="#00ff00")
+        self.input_panel = Frame(parent, bg=CONTROL_BG_COLOR)
         self.input_panel.pack(fill="both", expand=True)
         parent.add(self.input_panel, text=self.add_transaction_label.get())
 
@@ -297,8 +350,10 @@ class BudgetTracker:
 
     ### Create date input widgets
     def create_date_input_widgets(self, parent):
-        Label(parent, textvariable=self.date_label).pack()
-        date_input_panel = Frame(parent, bg="#0000ff")
+        Label(
+            parent, textvariable=self.date_label, bg=CONTROL_BG_COLOR, fg=TEXT_COLOR
+        ).pack()
+        date_input_panel = Frame(parent, bg=CONTROL_BG_COLOR)
         date_input_panel.pack()
         date_input_panel.grid_rowconfigure(0, weight=1)
         for i in range(3):
@@ -332,7 +387,9 @@ class BudgetTracker:
 
     ### Create income/expense input widgets
     def create_income_expense_input_widgets(self, parent):
-        Label(parent, textvariable=self.type_label).pack()
+        Label(
+            parent, textvariable=self.type_label, bg=CONTROL_BG_COLOR, fg=TEXT_COLOR
+        ).pack()
         self.income_radio = ttk.Radiobutton(
             parent,
             text=self.get_label("รายรับ", "Income"),
@@ -352,7 +409,9 @@ class BudgetTracker:
 
     ### Create category input widgets
     def create_category_input_widgets(self, parent):
-        Label(parent, textvariable=self.category_label).pack()
+        Label(
+            parent, textvariable=self.category_label, bg=CONTROL_BG_COLOR, fg=TEXT_COLOR
+        ).pack()
         self.categorie_option = ttk.Combobox(
             parent, textvariable=self.category_var, state="readonly"
         )
@@ -362,7 +421,9 @@ class BudgetTracker:
 
     ### Create amount input widgets
     def create_amount_input_widgets(self, parent):
-        Label(parent, textvariable=self.amount_label).pack()
+        Label(
+            parent, textvariable=self.amount_label, bg=CONTROL_BG_COLOR, fg=TEXT_COLOR
+        ).pack()
         vcmd = (self.root.register(self.validate_amount), "%P")
         Entry(
             parent,
@@ -373,14 +434,15 @@ class BudgetTracker:
 
     ### Create note input widgets
     def create_note_input_widgets(self, parent):
-        Label(parent, textvariable=self.note_label).pack()
-        self.note_text_widget = Text(parent, height=5)
-        self.note_var = Text(parent, height=5)
+        Label(
+            parent, textvariable=self.note_label, bg=CONTROL_BG_COLOR, fg=TEXT_COLOR
+        ).pack()
+        self.note_var = Text(parent, height=5, width=40)
         self.note_var.pack()
 
     ### Create save and reset button widgets
     def create_save_reset_button_widgets(self, parent):
-        button_panel = Frame(parent, bg="#ffff00")
+        button_panel = Frame(parent, bg=CONTROL_BG_COLOR)
         button_panel.pack(pady=PADDING)
         button_panel.grid_rowconfigure(0, weight=1)
         button_panel.grid_columnconfigure(0, weight=1)
@@ -390,9 +452,9 @@ class BudgetTracker:
         self.create_button_widgets(
             button_panel,
             self.save_button_label,
-            "#00ffff",
-            10,
-            self.save_transaction,
+            "Submit.TButton",
+            width=10,
+            command=self.save_transaction,
             pack_or_grid="grid",
             row=0,
             column=0,
@@ -403,7 +465,7 @@ class BudgetTracker:
         self.create_button_widgets(
             button_panel,
             self.reset_button_label,
-            "#00ffff",
+            "Normal.TButton",
             10,
             self.reset_fields,
             pack_or_grid="grid",
@@ -423,14 +485,19 @@ class BudgetTracker:
         self,
         parent,
         text_var,
-        bg_color,
+        style,
         width,
         command,
         pack_or_grid="pack",
         **options,
     ):
-        btn = Button(
-            parent, textvariable=text_var, bg=bg_color, width=width, command=command
+
+        btn = ttk.Button(
+            parent,
+            textvariable=text_var,
+            style=style,
+            width=width,
+            command=command,
         )
 
         if pack_or_grid == "pack":
