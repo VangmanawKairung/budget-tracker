@@ -531,7 +531,11 @@ class BudgetTracker:
     def validate_amount(self, amount):
         if amount == "":
             return True
-        return amount.isdigit()
+        try:
+            float(amount)
+            return True
+        except ValueError:
+            return False
 
     # Save transaction
     def save_transaction(self):
