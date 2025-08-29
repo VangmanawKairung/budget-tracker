@@ -52,53 +52,64 @@ class BudgetTracker:
 
         #################### Label variables ####################
         # Display panel labels
+        ## Heading panel
         self.title_label = StringVar(value=APP_TITLE)
-        self.total_income_label = StringVar(value="0.00")
-        self.total_expense_label = StringVar(value="0.00")
-        self.total_balance_label = StringVar(value="0.00")
-        self.date_label = StringVar(value="วันที่")  # Also used in input panel
-        self.type_label = StringVar(
-            value="ประเภท"
-        )  # Also used in input panel and filter panel
-        self.category_label = StringVar(
-            value="หมวดหมู่"
-        )  # Also used in input panel and filter panel
-        self.amount_label = StringVar(value="จำนวนเงิน")  # Also used in input panel
-        self.description_label = StringVar(
-            value="รายละเอียด"
-        )  # Also used in input panel
+
+        ## Summary panel
+        self.total_income_label = StringVar(value="รายรับทั้งหมด")
+        self.total_expense_label = StringVar(value="รายจ่ายทั้งหมด")
+        self.total_balance_label = StringVar(value="ยอดคงเหลือ")
+
+        ## Transaction list panel
+        self.heading_date_label = StringVar(value="วันที่")
+        self.heading_category_label = StringVar(value="หมวดหมู่")
+        self.heading_type_label = StringVar(value="ประเภท")
+        self.heading_amount_label = StringVar(value="จำนวน")
+        self.heading_note_label = StringVar(value="หมายเหตุ")
         self.process_label = StringVar(value="การดำเนินการ")
         self.process_edit_button_label = StringVar(value="แก้ไข")
         self.process_delete_button_label = StringVar(value="ลบ")
 
         # Input panel labels
         self.add_transaction_label = StringVar(value="เพิ่มรายการ")
+        self.date_label = StringVar(value="วันที่")
+        self.type_label = StringVar(value="ประเภท")
+        self.category_label = StringVar(value="หมวดหมู่")
+        self.amount_label = StringVar(value="จำนวนเงิน")
         self.category_input_option_label = StringVar(value="เลือกหมวดหมู่")
         self.note_label = StringVar(value="หมายเหตุ (ไม่จำเป็น)")
         self.save_button_label = StringVar(value="บันทึก")
         self.reset_button_label = StringVar(value="ล้างข้อมูล")
 
         # Filter panel labels
-        self.filter_label = StringVar(value="ตัวกรอง")
-        self.start_date_filter_label = StringVar(value="วันที่เริ่มต้น")
-        self.end_date_filter_label = StringVar(value="วันที่สิ้นสุด")
-        self.category_filter_option_label = StringVar(value="ทั้งหมด")
-        self.apply_filter_button_label = StringVar(value="ใช้ตัวกรอง")
-        self.clear_filter_button_label = StringVar(value="ล้างตัวกรอง")
-        self.export_csv_button_label = StringVar(value="ส่งออก CSV")
-        self.export_pdf_button_label = StringVar(value="ส่งออก PDF")
-        self.delete_all_button_label = StringVar(value="ลบทั้งหมด")
+        # self.filter_label = StringVar(value="ตัวกรอง")
+        # self.start_date_filter_label = StringVar(value="วันที่เริ่มต้น")
+        # self.end_date_filter_label = StringVar(value="วันที่สิ้นสุด")
+        # self.category_filter_option_label = StringVar(value="ทั้งหมด")
+        # self.apply_filter_button_label = StringVar(value="ใช้ตัวกรอง")
+        # self.clear_filter_button_label = StringVar(value="ล้างตัวกรอง")
+        # self.export_csv_button_label = StringVar(value="ส่งออก CSV")
+        # self.export_pdf_button_label = StringVar(value="ส่งออก PDF")
+        # self.delete_all_button_label = StringVar(value="ลบทั้งหมด")
 
         #################### Common variables ####################
+        # Language toggle variable
         self.lang_var = StringVar(value="th")
-        self.date_var = StringVar(value=datetime.now().strftime("%d-%m-%Y"))
+
+        # Total value variables
+        self.total_income_var = StringVar(value="0.00")
+        self.total_expense_var = StringVar(value="0.00")
+        self.total_balance_var = StringVar(value="0.00")
+
+        # Input variables
         self.day_var = StringVar(value=datetime.now().day)
         self.month_var = StringVar(value=datetime.now().month)
         self.year_var = StringVar(value=datetime.now().year)
         self.transaction_type_var = StringVar(value="income")
         self.category_var = StringVar()
         self.amount_var = StringVar()
-        self.desc_var = StringVar()
+
+        # Loaded transaction variable
         self.loaded_transactions = []
 
         #################### Execute ####################
@@ -152,27 +163,29 @@ class BudgetTracker:
     ## Create summary panel
     def create_summary_panel(self, parent):
 
-        print(
-            self.total_income_label, self.total_expense_label, self.total_balance_label
-        )
         self.create_summary_widgets(
             parent,
             "#00ffff",
-            "รายรับรวม",
             self.total_income_label,
+            self.total_income_var,
             row=1,
             column=0,
         )
         self.create_summary_widgets(
             parent,
             "#ffff00",
-            "รายจ่ายรวม",
             self.total_expense_label,
+            self.total_expense_var,
             row=1,
             column=1,
         )
         self.create_summary_widgets(
-            parent, "#ff00ff", "คงเหลือ", self.total_balance_label, row=1, column=2
+            parent,
+            "#ff00ff",
+            self.total_balance_label,
+            self.total_balance_var,
+            row=1,
+            column=2,
         )
 
     ### Create summary widgets
@@ -180,12 +193,61 @@ class BudgetTracker:
         sub_frame = Frame(parent, bg=bg, padx=10, relief="ridge", bd=2)
         sub_frame.grid(**options)
 
-        Label(sub_frame, text=head_label).pack()
+        Label(sub_frame, textvariable=head_label).pack()
         Label(sub_frame, textvariable=value_label).pack()
 
     ## Create transaction list panel
     def create_transaction_list_panel(self, parent):
-        pass
+        table_frame = Frame(parent)
+        table_frame.grid(row=2, column=0, columnspan=3)
+
+        columns_name = ("date", "category", "type", "amount", "note")
+        self.transaction_table = ttk.Treeview(
+            table_frame, columns=columns_name, show="headings"
+        )
+
+        self.transaction_table.heading("date", text=self.heading_date_label.get())
+        self.transaction_table.heading(
+            "category", text=self.heading_category_label.get()
+        )
+        self.transaction_table.heading("type", text=self.heading_type_label.get())
+        self.transaction_table.heading("amount", text=self.heading_amount_label.get())
+        self.transaction_table.heading("note", text=self.heading_note_label.get())
+
+        self.transaction_table.column("date", width=80)
+        self.transaction_table.column("category", width=100)
+        self.transaction_table.column("type", width=80)
+        self.transaction_table.column("amount", width=100, anchor="e")
+        self.transaction_table.column("note", width=200)
+
+        scrollbar = ttk.Scrollbar(
+            table_frame, orient="vertical", command=self.transaction_table.yview
+        )
+        self.transaction_table.configure(yscroll=scrollbar.set)
+        scrollbar.pack(side="right", fill="y")
+        self.transaction_table.pack(fill="both", expand=True)
+
+        # เรียกรีเฟรชตอนสร้างครั้งแรก
+        self.refresh_transaction_table()
+
+    def refresh_transaction_table(self):
+        # ลบข้อมูลเก่า
+        for row in self.transaction_table.get_children():
+            self.transaction_table.delete(row)
+
+        # ใส่ข้อมูลใหม่
+        for data in self.loaded_transactions:
+            self.transaction_table.insert(
+                "",
+                "end",
+                values=(
+                    data["Date"],
+                    data["Category"],
+                    data["Type"],
+                    data["Amount"],
+                    data["Note"],
+                ),
+            )
 
     # Create control panel widgets
     def create_control_panel_widgets(self, parent):
@@ -196,38 +258,41 @@ class BudgetTracker:
         control_panel.grid_propagate(False)
 
         # Create control panel tabs
-        control_panel_tabs = ttk.Notebook(control_panel)
-        control_panel_tabs.pack(fill="both", expand=True)
+        self.control_panel_tabs = ttk.Notebook(control_panel)
+        self.control_panel_tabs.pack(fill="both", expand=True)
 
         # Create input panel inside control panel
-        self.create_input_panel_widgets(control_panel_tabs)
+        self.create_input_panel_widgets(self.control_panel_tabs)
 
         # Create filter panel inside control panel
-        # self.create_filter_panel_widgets(control_panel_tabs)
+        # self.create_filter_panel_widgets(self.control_panel_tabs)
 
     ## Create input panel widgets
     def create_input_panel_widgets(self, parent):
         # Create input panel inside control panel
-        input_panel = Frame(parent, bg="#00ff00")
-        input_panel.pack(fill="both", expand=True)
-        parent.add(input_panel, text="Input")
+        self.input_panel = Frame(parent, bg="#00ff00")
+        self.input_panel.pack(fill="both", expand=True)
+        parent.add(self.input_panel, text=self.add_transaction_label.get())
 
         # Add widgets in input panel
-        self.create_date_input_widgets(input_panel)  # Add date input to input panel
+        self.create_date_input_widgets(
+            self.input_panel
+        )  # Add date input to input panel
         self.create_income_expense_input_widgets(
-            input_panel
+            self.input_panel
         )  # Add radio buttons income and expense to input panel
         self.create_category_input_widgets(
-            input_panel
+            self.input_panel
         )  # Add category input to input panel
-        self.create_amount_input_widgets(input_panel)  # Add amount input to input panel
-        self.create_description_input_widgets(
-            input_panel
-        )  # Add description input to input panel
-        self.create_note_input_widgets(input_panel)  # Add note input to input panel
+        self.create_amount_input_widgets(
+            self.input_panel
+        )  # Add amount input to input panel
+        self.create_note_input_widgets(
+            self.input_panel
+        )  # Add note input to input panel
 
         self.create_save_reset_button_widgets(
-            input_panel
+            self.input_panel
         )  # Add save and reset buttons to input panel
 
     ### Create date input widgets
@@ -306,13 +371,6 @@ class BudgetTracker:
             validatecommand=vcmd,
         ).pack()
 
-    ### Create description input widgets
-    def create_description_input_widgets(self, parent):
-        Label(parent, textvariable=self.description_label).pack()
-        self.desc_text_widget = Text(parent, height=5)
-        self.desc_var = Text(parent, height=5)
-        self.desc_var.pack()
-
     ### Create note input widgets
     def create_note_input_widgets(self, parent):
         Label(parent, textvariable=self.note_label).pack()
@@ -355,10 +413,10 @@ class BudgetTracker:
         )
 
     ## Create filter panel widgets
-    def create_filter_panel_widgets(self, parent):
-        filter_panel = Frame(parent, bg="#ff0000")
-        filter_panel.pack(fill="both", expand=True)
-        parent.add(filter_panel, text="Filter")
+    # def create_filter_panel_widgets(self, parent):
+    #     self.filter_panel = Frame(parent, bg="#ff0000")
+    #     self.filter_panel.pack(fill="both", expand=True)
+    #     parent.add(self.filter_panel, text="Filter")
 
     ### Create button widgets
     def create_button_widgets(
@@ -392,37 +450,61 @@ class BudgetTracker:
             self.lang_var.set("th")
 
         # Update all labels based on the selected language
+        ## Display panel
+        ### Summary panel
         self.total_income_label.set(self.get_label("รายรับทั้งหมด", "Total Income"))
         self.total_expense_label.set(self.get_label("รายจ่ายทั้งหมด", "Total Expense"))
         self.total_balance_label.set(self.get_label("ยอดคงเหลือ", "Total Balance"))
-        self.date_label.set(self.get_label("วันที่", "Date"))
-        self.type_label.set(self.get_label("ประเภท", "Type"))
-        self.category_label.set(self.get_label("หมวดหมู่", "Category"))
-        self.amount_label.set(self.get_label("จำนวนเงิน", "Amount"))
-        self.description_label.set(self.get_label("รายละเอียด", "Description"))
+
+        ### Transaction list panel
+        self.heading_date_label.set(self.get_label("วันที่", "Date"))
+        self.heading_category_label.set(self.get_label("หมวดหมู่", "Category"))
+        self.heading_type_label.set(self.get_label("ประเภท", "Type"))
+        self.heading_amount_label.set(self.get_label("จำนวนเงิน", "Amount"))
+        self.heading_note_label.set(
+            self.get_label("หมายเหตุ (ไม่จำเป็น)", "Note (Optional)")
+        )
         self.process_label.set(self.get_label("การดำเนินการ", "Process"))
         self.process_edit_button_label.set(self.get_label("แก้ไข", "Edit"))
         self.process_delete_button_label.set(self.get_label("ลบ", "Delete"))
+
+        ## Control panel
+        ### Add transaction panel
         self.add_transaction_label.set(self.get_label("เพิ่มรายการ", "Add Transaction"))
+        self.date_label.set(self.get_label("วันที่", "Date"))
+        self.type_label.set(self.get_label("ประเภท", "Type"))
+        self.income_radio.config(text=self.get_label("รายรับ", "Income"))
+        self.expense_radio.config(text=self.get_label("รายจ่าย", "Expense"))
+        self.category_label.set(self.get_label("หมวดหมู่", "Category"))
         self.category_input_option_label.set(
             self.get_label("เลือกหมวดหมู่", "Select Category")
         )
+        self.amount_label.set(self.get_label("จำนวนเงิน", "Amount"))
         self.note_label.set(self.get_label("หมายเหตุ (ไม่จำเป็น)", "Note (Optional)"))
         self.save_button_label.set(self.get_label("บันทึก", "Save"))
         self.reset_button_label.set(self.get_label("ล้างข้อมูล", "Reset"))
-        self.filter_label.set(self.get_label("ตัวกรอง", "Filter"))
-        self.start_date_filter_label.set(self.get_label("วันที่เริ่มต้น", "Start Date"))
-        self.end_date_filter_label.set(self.get_label("วันที่สิ้นสุด", "End Date"))
-        self.category_filter_option_label.set(self.get_label("ทั้งหมด", "All"))
-        self.apply_filter_button_label.set(self.get_label("ใช้ตัวกรอง", "Apply Filter"))
-        self.clear_filter_button_label.set(self.get_label("ล้างตัวกรอง", "Clear Filter"))
-        self.export_csv_button_label.set(self.get_label("ส่งออก CSV", "Export CSV"))
-        self.export_pdf_button_label.set(self.get_label("ส่งออก PDF", "Export PDF"))
-        self.delete_all_button_label.set(self.get_label("ลบทั้งหมด", "Delete All"))
 
-        # Update radiobutton texts
-        self.income_radio.config(text=self.get_label("รายรับ", "Income"))
-        self.expense_radio.config(text=self.get_label("รายจ่าย", "Expense"))
+        ### Filter panel
+        # self.filter_label.set(self.get_label("ตัวกรอง", "Filter"))
+        # self.start_date_filter_label.set(self.get_label("วันที่เริ่มต้น", "Start Date"))
+        # self.end_date_filter_label.set(self.get_label("วันที่สิ้นสุด", "End Date"))
+        # self.category_filter_option_label.set(self.get_label("ทั้งหมด", "All"))
+        # self.apply_filter_button_label.set(self.get_label("ใช้ตัวกรอง", "Apply Filter"))
+        # self.clear_filter_button_label.set(self.get_label("ล้างตัวกรอง", "Clear Filter"))
+        # self.export_csv_button_label.set(self.get_label("ส่งออก CSV", "Export CSV"))
+        # self.export_pdf_button_label.set(self.get_label("ส่งออก PDF", "Export PDF"))
+        # self.delete_all_button_label.set(self.get_label("ลบทั้งหมด", "Delete All"))
+
+        self.control_panel_tabs.tab(
+            self.input_panel, text=self.add_transaction_label.get()
+        )
+        # self.control_panel_tabs.tab(self.filter_panel, text=self.filter_label.get())
+
+        self.transaction_table.heading("date", text=self.date_label.get())
+        self.transaction_table.heading("category", text=self.category_label.get())
+        self.transaction_table.heading("type", text=self.type_label.get())
+        self.transaction_table.heading("amount", text=self.amount_label.get())
+        self.transaction_table.heading("note", text=self.note_label.get())
 
         # Update category values in combobox
         self.get_category_values()
@@ -446,16 +528,6 @@ class BudgetTracker:
             ]
         self.categorie_option.current(0)
 
-    # Set the selected date in the date input fields
-    def set_selected_date(self):
-        self.date_var.set(
-            datetime(
-                self.year_var.get(), self.month_var.get(), self.day_var.get()
-            ).strftime("%d-%m-%Y")
-        )
-
-        print(self.date_var.get())
-
     # Amount validation
     def validate_amount(self, amount):
         if amount == "":
@@ -470,8 +542,6 @@ class BudgetTracker:
         transaction_type = self.transaction_type_var.get()
         category = self.category_var.get()
         amount = self.amount_var.get()
-        description = self.desc_text_widget.get("1.0", "end").strip()
-        description = self.desc_var.get("1.0", "end").strip()
         note = self.note_var.get("1.0", "end").strip()
 
         if not amount:
@@ -486,12 +556,8 @@ class BudgetTracker:
         with open(CSV_FILE, mode="a", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
             if not file_exists:
-                writer.writerow(
-                    ["Date", "Category", "Type", "Amount", "Description", "Note"]
-                )
-            writer.writerow(
-                [date, category, transaction_type, float(amount), description, note]
-            )
+                writer.writerow(["Date", "Category", "Type", "Amount", "Note"])
+            writer.writerow([date, category, transaction_type, float(amount), note])
 
         self.reset_fields()
         self.load_transactions()
@@ -504,8 +570,6 @@ class BudgetTracker:
         self.transaction_type_var.set("income")
         self.get_category_values()
         self.amount_var.set("")
-        self.desc_text_widget.delete("1.0", "end")
-        self.desc_var.delete("1.0", "end")
         self.note_var.delete("1.0", "end")
 
     # Load transactions from CSV file
@@ -514,6 +578,7 @@ class BudgetTracker:
             reader = csv.DictReader(file)
             self.loaded_transactions = list(reader)
         self.get_totals()
+        self.refresh_transaction_table()
 
     # Get total income, expense, and balance
     def get_totals(self):
@@ -536,9 +601,9 @@ class BudgetTracker:
         print(f"{total_income:,.2f}")
 
         # Update variables
-        self.total_income_label.set(f"{total_income:,.2f}")
-        self.total_expense_label.set(f"{total_expense:,.2f}")
-        self.total_balance_label.set(f"{total_balance:,.2f}")
+        self.total_income_var.set(f"{total_income:,.2f}")
+        self.total_expense_var.set(f"{total_expense:,.2f}")
+        self.total_balance_var.set(f"{total_balance:,.2f}")
 
 
 if __name__ == "__main__":
