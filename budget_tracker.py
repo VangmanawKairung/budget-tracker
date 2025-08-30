@@ -18,16 +18,18 @@ CONTROL_PANEL_WIDTH = APP_WIDTH * 0.4
 PADDING = 10
 
 # Color
+TEXT_COLOR = "#f1f0ee"
 DISPLAY_BG_COLOR = "#2b2b2b"
 CONTROL_BG_COLOR = "#0f0f0f"
 INCOME_COLOR = "#95e913"
 EXPENSE_COLOR = "#f50c20"
-BALANCE_COLOR = "#2323ff"
-TEXT_COLOR = "#f1f0ee"
+BALANCE_COLOR = "#6262ff"
 NORMAL_BTN_COLOR = "#2b2b2b"
 NORMAL_BTN_HOVER_COLOR = "#424242"
 SUBMIT_BTN_COLOR = "#0404e1"
 SUBMIT_BTN_HOVER_COLOR = "#2929ff"
+DELETE_BTN_COLOR = "#ff3b4b"
+DELETE_BTN_HOVER_COLOR = "#dc0012"
 
 # File
 CSV_FILE = "transactions.csv"
@@ -62,6 +64,7 @@ class BudgetTracker:
         # Display panel labels
         ## Heading panel
         self.title_label = StringVar(value=APP_TITLE)
+        self.lang_label = StringVar(value="English")
 
         ## Summary panel
         self.total_income_label = StringVar(value="รายรับทั้งหมด")
@@ -161,6 +164,54 @@ class BudgetTracker:
             foreground=[("disabled", TEXT_COLOR)],
         )
 
+        # Delete Button
+        style.configure(
+            "Delete.TButton",
+            background=DELETE_BTN_COLOR,
+            foreground=TEXT_COLOR,
+            borderwidth=0,
+            focusthickness=3,
+            focuscolor="none",
+        )
+        style.map(
+            "Delete.TButton",
+            background=[("active", DELETE_BTN_HOVER_COLOR)],
+            foreground=[("disabled", TEXT_COLOR)],
+        )
+
+        # Lang Button
+        style.configure(
+            "Lang.TButton",
+            background=DISPLAY_BG_COLOR,
+            foreground=TEXT_COLOR,
+            borderwidth=5,
+            relief="solid",
+            focusthickness=3,
+            focuscolor="none",
+            padding=PADDING - 2,
+        )
+        style.map(
+            "Lang.TButton",
+            background=[("active", DISPLAY_BG_COLOR)],
+            foreground=[("disabled", TEXT_COLOR)],
+        )
+
+        # Transaction table
+        style.configure(
+            "Transaction.Treeview",
+            background=DISPLAY_BG_COLOR,
+            foreground=TEXT_COLOR,
+            rowheight=40,
+            fieldbackground=DISPLAY_BG_COLOR,
+            font=("Arial", 11),
+        )
+        style.configure(
+            "Transaction.Treeview.Heading",
+            background="#000000",
+            foreground=TEXT_COLOR,
+            font=("Arial", 14, "bold"),
+        )
+
     #################### Create widgets ####################
     # Create main widgets
     def create_widget(self):
@@ -193,16 +244,28 @@ class BudgetTracker:
     ## Create title and language toggle button panel
     def create_title_lang_panel(self, parent):
         Label(
-            parent, textvariable=self.title_label, bg=DISPLAY_BG_COLOR, fg=TEXT_COLOR
+            parent,
+            textvariable=self.title_label,
+            bg=DISPLAY_BG_COLOR,
+            fg=TEXT_COLOR,
+            font=("Times", 30),
         ).grid(row=0, column=0, columnspan=2, sticky="w", padx=PADDING)
-        lang_button = Button(
-            parent, text="EN | TH", bg=DISPLAY_BG_COLOR, command=self.toggle_language
+        self.create_button_widgets(
+            parent,
+            self.lang_label,
+            "Lang.TButton",
+            10,
+            self.toggle_language,
+            "grid",
+            row=0,
+            column=2,
+            sticky="e",
+            padx=PADDING,
         )
-        lang_button.grid(row=0, column=2, sticky="e", padx=PADDING)
 
     ## Create summary panel
     def create_summary_panel(self, parent):
-
+        # Income summary widget
         self.create_summary_widgets(
             parent,
             INCOME_COLOR,
@@ -210,7 +273,12 @@ class BudgetTracker:
             self.total_income_var,
             row=1,
             column=0,
+            sticky="nsew",
+            padx=PADDING,
+            pady=PADDING + 20,
         )
+
+        # Expense summary widget
         self.create_summary_widgets(
             parent,
             EXPENSE_COLOR,
@@ -218,7 +286,12 @@ class BudgetTracker:
             self.total_expense_var,
             row=1,
             column=1,
+            sticky="nsew",
+            padx=PADDING,
+            pady=PADDING + 20,
         )
+
+        # Balance summary widget
         self.create_summary_widgets(
             parent,
             BALANCE_COLOR,
@@ -226,33 +299,58 @@ class BudgetTracker:
             self.total_balance_var,
             row=1,
             column=2,
+            sticky="nsew",
+            padx=PADDING,
+            pady=PADDING + 20,
         )
 
     ### Create summary widgets
-    def create_summary_widgets(self, parent, bg, head_label, value_label, **options):
+    def create_summary_widgets(
+        self, parent, text_color, head_label, value_label, **options
+    ):
         sub_frame = Frame(
             parent,
-            bg=bg,
+            bg=DISPLAY_BG_COLOR,
             relief="solid",
-            highlightthickness=2,
-            highlightbackground="#990000",
-            highlightcolor="#880088",
-            padx=10,
-            bd=2,
+            highlightthickness=5,
+            highlightbackground=text_color,
+            bd=0,
         )
         sub_frame.grid(**options)
+        sub_frame.grid_propagate(False)
 
-        Label(sub_frame, textvariable=head_label, bg=bg).pack()
-        Label(sub_frame, textvariable=value_label, bg=bg).pack()
+        Label(
+            sub_frame,
+            textvariable=head_label,
+            bg=DISPLAY_BG_COLOR,
+            foreground=TEXT_COLOR,
+            font=("Arial", 14),
+            padx=PADDING,
+            pady=PADDING + 5,
+        ).pack(anchor="w")
+        Label(
+            sub_frame,
+            textvariable=value_label,
+            bg=DISPLAY_BG_COLOR,
+            fg=text_color,
+            font=("Arial", 20),
+            padx=PADDING,
+            pady=PADDING,
+        ).pack(anchor="e", expand=True)
 
     ## Create transaction list panel
     def create_transaction_list_panel(self, parent):
         table_frame = Frame(parent)
-        table_frame.grid(row=2, column=0, columnspan=3)
+        table_frame.grid(
+            row=2, column=0, columnspan=3, sticky="nsew", padx=PADDING, pady=PADDING
+        )
 
         columns_name = ("date", "category", "type", "amount", "note")
         self.transaction_table = ttk.Treeview(
-            table_frame, columns=columns_name, show="headings"
+            table_frame,
+            columns=columns_name,
+            show="headings",
+            style="Transaction.Treeview",
         )
 
         self.transaction_table.heading("date", text=self.heading_date_label.get())
@@ -518,6 +616,9 @@ class BudgetTracker:
 
         # Update all labels based on the selected language
         ## Display panel
+        ### Heading panel
+        self.lang_label.set(self.get_label("English", "Thai"))
+
         ### Summary panel
         self.total_income_label.set(self.get_label("รายรับทั้งหมด", "Total Income"))
         self.total_expense_label.set(self.get_label("รายจ่ายทั้งหมด", "Total Expense"))
